@@ -17,7 +17,6 @@ y = df["is_anomaly"]
 
 model = IsolationForest(
     n_estimators=100,
-    contamination=0.02,
     random_state=42
 )
 
