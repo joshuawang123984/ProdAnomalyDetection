@@ -1,6 +1,6 @@
 import pandas as pd
 
-from sklearn.ensemble import IsolationForest
+from sklearn.neighbors import LocalOutlierFactor
 from sklearn.metrics import classification_report, confusion_matrix
 
 df = pd.read_csv("machine_data.csv")
@@ -15,10 +15,9 @@ features = [
 X = df[features]
 y = df["is_anomaly"]
 
-model = IsolationForest(
-    n_estimators=100,
-    contamination="auto",
-    random_state=42
+model = LocalOutlierFactor(
+    n_neighbors=20,
+    contamination="auto"
 )
 
 predicted = model.fit_predict(X)
