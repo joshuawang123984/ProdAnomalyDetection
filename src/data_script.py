@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-N = 10000
+N = 500
 
 np.random.seed(42)
 
@@ -45,12 +45,11 @@ df = pd.DataFrame({
 })
 
 
-
 df["is_anomaly"] = 0
 
 point_indices = np.random.choice(
     N,
-    size=50,
+    size=10,
     replace=False
 )
 
