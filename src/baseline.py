@@ -35,4 +35,13 @@ df["predicted_anomaly"] = predicted
 detected = df[df["predicted_anomaly"] == 1]
 
 print("\nDetected anomalies:")
-print(detected[features + ["is_anomaly", "predicted_anomaly"]])
+for index, row in detected.iterrows():
+    print(f"\nRow {index}")
+    print(f"Actual anomaly: {row['is_anomaly']}")
+
+    for feature in features:
+        print(
+            f"{feature}: "
+            f"value={row[feature]:.2f}, "
+            f"z-score={X_z.loc[index, feature]:.2f}"
+        )

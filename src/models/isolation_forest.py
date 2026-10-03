@@ -1,4 +1,6 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from sklearn.ensemble import IsolationForest
 from sklearn.metrics import classification_report, confusion_matrix
@@ -30,3 +32,11 @@ print(classification_report(y, predicted))
 
 print("Confusion Matrix:")
 print(confusion_matrix(y, predicted))
+
+sns.pairplot(
+    df,
+    vars=features,
+    hue="is_anomaly"
+)
+
+plt.show()
