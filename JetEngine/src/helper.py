@@ -1,5 +1,9 @@
 import pandas as pd
 
+def remove_features(df: pd.DataFrame, features: list[str]):
+    df = df.drop(columns=features)
+    return df
+
 def add_column_header(filename: str) -> pd.DataFrame:
     columns = [
         "unit_id",
