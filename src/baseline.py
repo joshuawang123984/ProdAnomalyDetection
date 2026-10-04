@@ -1,5 +1,4 @@
 import pandas as pd
-from scipy.stats import zscore
 from sklearn.metrics import classification_report, confusion_matrix
 
 df = pd.read_csv("machine_data.csv")
