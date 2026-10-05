@@ -1,5 +1,5 @@
 import pandas as pd
-from helper import add_column_header, remove_features
+from helper import *
 
 def main():
     df = add_column_header("CMAPSSDATA/train_FD001.txt")
@@ -14,6 +14,7 @@ def main():
         "setting_3",
         "sensor_1",
         "sensor_5",
+        "sensor_6",
         "sensor_10",
         "sensor_16",
         "sensor_18",
@@ -23,6 +24,10 @@ def main():
     df = remove_features(df, features_to_remove)
     print(df.head())
     print(df.shape)
+
+    features = [col for col in df.columns if col not in ["unit_id", "cycle"]]
+    # plot_features(df, features, 1)
+    find_correlations(df, features)
 
 if __name__ == '__main__':
     main()

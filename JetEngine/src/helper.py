@@ -1,6 +1,49 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-def remove_features(df: pd.DataFrame, features: list[str]):
+def find_correlations(df: pd.DataFrame, features: list[str]) -> None:
+    correlation = df[features].corr()
+
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(
+        correlation,
+        annot=True,
+        cmap="coolwarm",
+        fmt=".2f"
+    )
+
+    plt.title("Feature Correlation")
+    plt.show()
+
+def plot_features(df: pd.DataFrame, features: list[str], unit_id: int) -> None:
+    engine = df[df["unit_id"] == unit_id]
+
+    fig, axes = plt.subplots(5, 4, figsize=(16, 14))
+    axes = axes.flatten()
+
+    for i, feature in enumerate(features):
+        axes[i].plot(engine["cycle"], engine[feature])
+        axes[i].set_title(feature)
+        axes[i].set_xlabel("Cycle")
+        axes[i].set_ylabel("Value")
+
+    for i in range(len(features), len(axes)):
+        axes[i].set_visible(False)
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_feature(df: pd.DataFrame, feature: str, unit_id: int) -> None:
+    engine = df[df["unit_id"] == unit_id]
+
+    plt.plot(engine["cycle"], engine[feature])
+    plt.xlabel("Cycle")
+    plt.ylabel(feature)
+    plt.title(f"{feature} over time - Engine {unit_id}")
+    plt.show()
+
+def remove_features(df: pd.DataFrame, features: list[str]) -> pd.DataFrame:
     df = df.drop(columns=features)
     return df
 
