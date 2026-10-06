@@ -77,6 +77,19 @@ def main():
     validation_errors = evaluate(model, X_validation)
     test_errors = evaluate(model, X_test)
 
+    if True:
+        test_df = test_df.copy()
+        test_df["reconstruction_error"] = test_errors.numpy()
+
+        engine = test_df[test_df["unit_id"] == 86]
+
+        plt.plot(engine["cycle"], engine["reconstruction_error"])
+
+        plt.xlabel("Cycle")
+        plt.ylabel("Reconstruction Error")
+        plt.title("Engine 86 Reconstruction Error")
+        plt.show()
+
     print("Train:")
     print(train_errors.mean().item())
 
