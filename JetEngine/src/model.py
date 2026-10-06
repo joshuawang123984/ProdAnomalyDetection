@@ -8,11 +8,15 @@ class Autoencoder(nn.Module):
         self.encoder = nn.Sequential(
             nn.Linear(input_size, 8),
             nn.ReLU(),
-            nn.Linear(8, 2)
+            nn.Linear(8, 6),
+            nn.ReLU(),
+            nn.Linear(6, 4)
         )
 
         self.decoder = nn.Sequential(
-            nn.Linear(2, 8),
+            nn.Linear(4, 6),
+            nn.ReLU(),
+            nn.Linear(6, 8),
             nn.ReLU(),
             nn.Linear(8, input_size)
         )
