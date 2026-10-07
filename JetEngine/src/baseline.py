@@ -1,5 +1,6 @@
 import pandas as pd
 import torch
+import os
 import torch.nn as nn
 from helper import *
 from model import Autoencoder
@@ -55,17 +56,23 @@ def main():
     validation_errors = evaluate(model, X_validation)
     predicted = (validation_errors > threshold).int()
 
-    print("Normal error:", normal_errors.mean().item())
-    print("Threshold:", threshold.item())
-    print("Validation error:", validation_errors.mean().item())
-    print("Anomalies:", predicted.sum().item())
-    print("Total:", len(predicted))
+    result = {
+        "experiment": "baseline",
+        "feature_count": len(features),
+        "normal_error": normal_errors.mean().item(),
+        "threshold": threshold.item(),
+        "validation_error": validation_errors.mean().item(),
+        "anomalies": predicted.sum().item(),
+        "total": len(predicted),
+        "anomaly_rate": predicted.float().mean().item()
+    }
 
-    validation_results = validation_df.copy()
-    validation_results["reconstruction_error"] = validation_errors.numpy()
-    validation_results["predicted_anomaly"] = predicted.numpy()
-
-    print(validation_results[validation_results["predicted_anomaly"] == 1])
+    pd.DataFrame([result]).to_csv(
+        "features_subset_results.csv",
+        mode="a",
+        header=not os.path.exists("features_subset_results.csv"),
+        index=False
+    )
 
 if __name__ == '__main__':
     main()
