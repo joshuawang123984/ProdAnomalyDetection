@@ -39,7 +39,8 @@ def main():
     validation_df = df.iloc[int(0.7 * len(df)):]
 
     experiments = {
-        "stricter": [
+
+        "constant_removed": [
             "setting_3",
             "sensor_1",
             "sensor_5",
@@ -49,12 +50,37 @@ def main():
             "sensor_19"
         ],
 
-        "stricter_no_sensor6": [
+        "constant_low_variance_removed": [
             "setting_3",
             "sensor_1",
             "sensor_5",
             "sensor_6",
             "sensor_10",
+            "sensor_16",
+            "sensor_18",
+            "sensor_19"
+        ],
+
+        "correlation_removed": [
+            "setting_3",
+            "sensor_1",
+            "sensor_5",
+            "sensor_10",
+            "sensor_16",
+            "sensor_18",
+            "sensor_19",
+            "sensor_14",
+            "sensor_11"
+        ],
+
+        "aggressive": [
+            "setting_3",
+            "sensor_1",
+            "sensor_5",
+            "sensor_6",
+            "sensor_10",
+            "sensor_11",
+            "sensor_14",
             "sensor_16",
             "sensor_18",
             "sensor_19"

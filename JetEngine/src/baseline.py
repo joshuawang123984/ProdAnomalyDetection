@@ -1,14 +1,15 @@
 import pandas as pd
 import torch
 import os
+import joblib
 import torch.nn as nn
 from helper import *
 from model import Autoencoder
 from sklearn.preprocessing import StandardScaler
 
-def train(model, X_train, epochs=1000):
+def train(model, X_train, epochs=2000):
     criterion = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
     model.train()
 
     for epoch in range(epochs):
@@ -47,7 +48,7 @@ def main():
     X_train = torch.tensor(X_train, dtype=torch.float32)
     X_validation = torch.tensor(X_validation, dtype=torch.float32)
 
-    model = Autoencoder(len(features))
+    model = Autoencoder(len(features), latent_size=4)
     model = train(model, X_train)
 
     normal_errors = evaluate(model, X_train)
@@ -55,6 +56,10 @@ def main():
 
     validation_errors = evaluate(model, X_validation)
     predicted = (validation_errors > threshold).int()
+
+    torch.save(model.state_dict(), "models/autoencoder/autoencoder.pth")
+    joblib.dump(scaler, "models/autoencoder/scaler.joblib")
+    joblib.dump(threshold.item(), "models/autoencoder/threshold.joblib")
 
     result = {
         "experiment": "baseline",

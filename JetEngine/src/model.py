@@ -2,23 +2,23 @@ import torch
 import torch.nn as nn
 
 class Autoencoder(nn.Module):
-    def __init__(self, input_size):
+    def __init__(self, input_size, latent_size):
         super().__init__()
 
         self.encoder = nn.Sequential(
-            nn.Linear(input_size, 8),
+            nn.Linear(input_size, 16),
             nn.ReLU(),
-            nn.Linear(8, 6),
+            nn.Linear(16, 8),
             nn.ReLU(),
-            nn.Linear(6, 4)
+            nn.Linear(8, latent_size)
         )
 
         self.decoder = nn.Sequential(
-            nn.Linear(4, 6),
+            nn.Linear(latent_size, 8),
             nn.ReLU(),
-            nn.Linear(6, 8),
+            nn.Linear(8, 16),
             nn.ReLU(),
-            nn.Linear(8, input_size)
+            nn.Linear(16, input_size)
         )
 
     def forward(self, x):
