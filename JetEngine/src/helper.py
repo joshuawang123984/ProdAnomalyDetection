@@ -2,6 +2,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+def plot_reconstruction_error(results: pd.DataFrame, unit_id: int, threshold: float) -> None:
+    engine = results[results["unit_id"] == unit_id]
+
+    plt.figure(figsize=(12, 5))
+    plt.plot(engine["cycle"], engine["error"], label="Reconstruction error")
+    plt.axhline(y=threshold, color="red", linestyle="--", label="Anomaly threshold")
+
+    plt.title(f"Engine {unit_id}: Reconstruction Error")
+    plt.xlabel("Cycle")
+    plt.ylabel("Reconstruction Error")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
 def find_correlations(df: pd.DataFrame, features: list[str]) -> None:
     correlation = df[features].corr()
 
