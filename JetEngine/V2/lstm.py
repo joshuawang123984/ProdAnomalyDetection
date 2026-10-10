@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
+import os
 
 class LSTMAutoencoder(nn.Module):
     def __init__(self, n_features, hidden_size=64):
@@ -79,30 +80,47 @@ def load_and_train(train_windows: str, val_windows: str, epochs: int) -> tuple[L
 def main():
     train_windows = "train_windows.npy"
     val_windows = "val_windows.npy"
-    epochs = 50
-    model, X_train, X_val = load_and_train(train_windows, val_windows, epochs)
 
-    model.eval()
+    model_path = "processed/lstm_autoencoder.pth"
+    threshold_path = "processed/anomaly_threshold.npy"
 
-    with torch.no_grad():
-        train_reconstructed = model(X_train)
-        val_reconstructed = model(X_val)
+    if os.path.exists(model_path) and os.path.exists(threshold_path):
+        X_train = torch.tensor(np.load(train_windows), dtype=torch.float32)
+        X_val = torch.tensor(np.load(val_windows), dtype=torch.float32)
 
-        train_errors = torch.mean((X_train - train_reconstructed) ** 2, dim=(1, 2)).numpy()
-        val_errors = torch.mean((X_val - val_reconstructed) ** 2, dim=(1, 2)).numpy()
+        model = LSTMAutoencoder(n_features=X_train.shape[2])
+        model.load_state_dict(torch.load(model_path, map_location="cpu"))
 
-    threshold = train_errors.mean() + 3 * train_errors.std()
+        threshold = float(np.load(threshold_path))
+
+    else:
+        epochs = 50
+        model, X_train, X_val = load_and_train(train_windows, val_windows, epochs)
+
+        model.eval()
+        with torch.no_grad():
+            train_reconstructed = model(X_train)
+
+            train_errors = torch.mean((X_train - train_reconstructed) ** 2, dim=(1, 2)).numpy()
+
+        threshold = train_errors.mean() + 3 * train_errors.std()
+        torch.save(model.state_dict(), model_path)
+        np.save(threshold_path, np.array(threshold))
+
+    model.eval() 
+    with torch.no_grad(): 
+        train_reconstructed = model(X_train) 
+        val_reconstructed = model(X_val) 
+        train_errors = torch.mean((X_train - train_reconstructed) ** 2, dim=(1, 2)).numpy() 
+        val_errors = torch.mean( (X_val - val_reconstructed) ** 2, dim=(1, 2)).numpy()
 
     print("\nThreshold:", threshold)
     print("Validation windows:", len(val_errors))
     print("Validation flagged:", np.sum(val_errors > threshold))
     print("Validation flagged (%):", 100 * np.mean(val_errors > threshold))
 
-    torch.save(model.state_dict(), "processed/lstm_autoencoder.pth")
-
     np.save("processed/train_errors.npy", train_errors)
     np.save("processed/val_errors.npy", val_errors)
-    np.save("processed/anomaly_threshold.npy", np.array(threshold))
 
 if __name__ == '__main__':
     main()
