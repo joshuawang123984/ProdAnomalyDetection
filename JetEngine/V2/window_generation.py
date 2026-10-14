@@ -3,6 +3,8 @@ import pandas as pd
 import joblib
 from sklearn.preprocessing import StandardScaler
 
+no_feature_eight = True
+
 def add_column_header(filename: str) -> pd.DataFrame:
     columns = [
         "unit_id",
@@ -88,6 +90,9 @@ if __name__ == '__main__':
 
     # assumes train and test have same features
     features = [col for col in df.columns if col not in ["unit_id", "cycle"]]
+
+    if no_feature_eight:
+        features.remove("sensor_8")
     train_df, val_df, test_df = scale_df(df, test_df, features)
 
     train_windows, train_metadata = create_windows(train_df, features, window_size=30)
