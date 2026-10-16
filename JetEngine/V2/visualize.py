@@ -55,6 +55,27 @@ def visualize(errors, threshold, metadata, unit_id):
     plt.tight_layout()
     plt.show()
 
+def visualize_rul(metadata, unit_id):
+    engine = metadata[metadata["unit_id"] == unit_id].sort_values("window_rul")
+
+    plt.figure(figsize=(14, 5))
+    plt.plot(engine["window_rul"], engine["error"])
+
+    plt.axhline(
+        float(np.load("processed/anomaly_threshold.npy")),
+        color="red",
+        linestyle="--",
+        label="Anomaly threshold"
+    )
+
+    plt.xlabel("Remaining Useful Life (cycles)")
+    plt.ylabel("Reconstruction error")
+    plt.title(f"Reconstruction Error vs RUL — Engine {unit_id}")
+    plt.gca().invert_xaxis()
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
 if __name__ == '__main__':
     test = True
 
@@ -81,6 +102,10 @@ if __name__ == '__main__':
             + metadata["final_cycle"]
             - metadata["end_cycle"]
         )
+    else:
+        # validation engines come from training data, which runs to failure
+        metadata["final_cycle"] = metadata.groupby("unit_id")["end_cycle"].transform("max")
+        metadata["window_rul"] = metadata["final_cycle"] - metadata["end_cycle"]
 
     anomaly_indices = np.where(errors > threshold)[0]
 
@@ -97,4 +122,5 @@ if __name__ == '__main__':
             f"mean={errors_info.mean():.4f}"
         )
 
-    visualize(errors, threshold, metadata=metadata, unit_id=24)
+    # visualize(errors, threshold, metadata=metadata, unit_id=24)
+    visualize_rul(metadata, unit_id=24)
