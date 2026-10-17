@@ -103,7 +103,8 @@ def main():
 
             train_errors = torch.mean((X_train - train_reconstructed) ** 2, dim=(1, 2)).numpy()
 
-        threshold = train_errors.mean() + 3 * train_errors.std()
+        # threshold = train_errors.mean() + 3 * train_errors.std()
+        threshold = np.percentile(train_errors, 95)
         torch.save(model.state_dict(), model_path)
         np.save(threshold_path, np.array(threshold))
 

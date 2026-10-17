@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from lstm import LSTMAutoencoder
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     X_val = torch.tensor(np.load("val_windows.npy"), dtype=torch.float32)
@@ -24,3 +25,28 @@ if __name__ == '__main__':
 
         for j in top_features:
             print(f"  Feature {j}: {feature_errors[idx, j]:.4f}")
+
+    feature_idx = 8
+
+    for idx in [1198, 2123, 4486]:
+        original = X_val[idx, :, feature_idx].numpy()
+        reconstructed_feature = reconstructed[idx, :, feature_idx].numpy()
+
+        plt.figure(figsize=(12, 4))
+        plt.plot(original, label="Original")
+        plt.plot(reconstructed_feature, label="Reconstructed")
+        plt.title(f"Window {idx} — Feature {feature_idx}")
+        plt.legend()
+        plt.show()
+
+    sensor_8 = X_val[:, :, 8].numpy()
+
+    sensor_8 = sensor_8.reshape(-1)
+
+    plt.figure(figsize=(15, 5))
+    plt.plot(sensor_8)
+    plt.xlabel("Time step")
+    plt.ylabel("Sensor 8 measurement")
+    plt.title("Sensor 8 Across Validation Data")
+    plt.tight_layout()
+    plt.show()

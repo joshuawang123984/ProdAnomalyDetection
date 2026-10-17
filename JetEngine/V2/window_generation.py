@@ -103,6 +103,6 @@ if __name__ == '__main__':
     np.save("val_windows.npy", val_windows)
     np.save("test_windows.npy", test_windows)
 
-    train_metadata.to_csv("train_window_metadata.csv", index=False)
-    val_metadata.to_csv("val_window_metadata.csv", index=False)
-    test_metadata.to_csv("test_window_metadata.csv", index=False)
+    train_metadata.to_csv("processed/train_window_metadata.csv", index=False)
+    val_metadata.to_csv("processed/val_window_metadata.csv", index=False)
+    test_metadata.to_csv("processed/test_window_metadata.csv", index=False)
