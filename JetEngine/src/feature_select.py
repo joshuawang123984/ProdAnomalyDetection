@@ -126,7 +126,7 @@ def main():
         pd.DataFrame([result]).to_csv(
             "features_subset_results.csv",
             mode="a",
-            header=not os.path.exists("features_subset_results.csv"),
+            header=not os.path.exists("src/features_subset_results.csv"),
             index=False
         )
 

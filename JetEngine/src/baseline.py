@@ -36,7 +36,7 @@ def evaluate(model, X):
 def main():
     df = add_column_header("CMAPSSDATA/train_FD001.txt")
 
-    train_df = df.iloc[:int(0.7 * len(df))]
+    train_df = df.iloc[:int(0.3 * len(df))]
     validation_df = df.iloc[int(0.7 * len(df)):]
 
     scaler = StandardScaler()

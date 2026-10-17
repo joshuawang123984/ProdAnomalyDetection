@@ -32,5 +32,15 @@ def main():
     print("Total:", len(predicted))
     print("Anomaly rate:", predicted.float().mean().item())
 
+    results = df[["unit_id", "cycle"]].copy()
+    results["error"] = errors.numpy()
+    results["anomaly"] = predicted.numpy()
+
+    print(results[results["anomaly"] == 1])
+
+    plot_reconstruction_error(results, 34, threshold)
+    plot_reconstruction_error(results, 42, threshold)
+    plot_reconstruction_error(results, 81, threshold)
+
 if __name__ == '__main__':
-    main()
+    main() 
