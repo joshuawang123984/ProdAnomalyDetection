@@ -123,4 +123,5 @@ if __name__ == '__main__':
         )
 
     # visualize(errors, threshold, metadata=metadata, unit_id=24)
-    visualize_rul(metadata, unit_id=34)
+    for i in range(1, 100):
+        visualize_rul(metadata, unit_id=i)
