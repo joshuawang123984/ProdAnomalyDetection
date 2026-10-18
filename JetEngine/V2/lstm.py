@@ -42,7 +42,7 @@ def load_and_train(train_windows: str, val_windows: str, epochs: int) -> tuple[L
 
     train_loader = DataLoader(TensorDataset(X_train), batch_size=128, shuffle=True)
 
-    model = LSTMAutoencoder(n_features=X_train.shape[2], hidden_size=64)
+    model = LSTMAutoencoder(n_features=X_train.shape[2], hidden_size=128)
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
