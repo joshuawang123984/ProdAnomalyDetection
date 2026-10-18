@@ -12,7 +12,7 @@ def main():
     if os.path.exists(model_path) and os.path.exists(threshold_path):
         X_test = torch.tensor(np.load(test_windows), dtype=torch.float32)
 
-        model = LSTMAutoencoder(n_features=X_test.shape[2], hidden_size=128)
+        model = LSTMAutoencoder(n_features=X_test.shape[2], hidden_size=256)
         model.load_state_dict(torch.load(model_path, map_location="cpu"))
 
         threshold = float(np.load(threshold_path))
