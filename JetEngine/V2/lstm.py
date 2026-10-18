@@ -42,7 +42,7 @@ def load_and_train(train_windows: str, val_windows: str, epochs: int) -> tuple[L
 
     train_loader = DataLoader(TensorDataset(X_train), batch_size=128, shuffle=True)
 
-    model = LSTMAutoencoder(n_features=X_train.shape[2])
+    model = LSTMAutoencoder(n_features=X_train.shape[2], hidden_size=16)
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -78,8 +78,8 @@ def load_and_train(train_windows: str, val_windows: str, epochs: int) -> tuple[L
     return model, X_train, X_val
 
 def main():
-    train_windows = "train_windows.npy"
-    val_windows = "val_windows.npy"
+    train_windows = "processed/train_windows.npy"
+    val_windows = "processed/val_windows.npy"
 
     model_path = "processed/lstm_autoencoder.pth"
     threshold_path = "processed/anomaly_threshold.npy"
@@ -104,7 +104,7 @@ def main():
             train_errors = torch.mean((X_train - train_reconstructed) ** 2, dim=(1, 2)).numpy()
 
         # threshold = train_errors.mean() + 3 * train_errors.std()
-        threshold = np.percentile(train_errors, 97.5)
+        threshold = np.percentile(train_errors, 95)
         torch.save(model.state_dict(), model_path)
         np.save(threshold_path, np.array(threshold))
 

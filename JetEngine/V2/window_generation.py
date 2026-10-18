@@ -81,7 +81,7 @@ def scale_df(train_df: pd.DataFrame, test_df: pd.DataFrame, features: list[str])
     val_split[features] = scaler.transform(val_split[features])
     test_split[features] = scaler.transform(test_split[features])
 
-    joblib.dump(scaler, "scaler.joblib")
+    joblib.dump(scaler, "processed/scaler.joblib")
     return train_split, val_split, test_split
 
 if __name__ == '__main__':
@@ -100,9 +100,9 @@ if __name__ == '__main__':
     val_windows, val_metadata = create_windows(val_df, features, window_size=window_size)
     test_windows, test_metadata = create_windows(test_df, features, window_size=window_size)
 
-    np.save("train_windows.npy", train_windows)
-    np.save("val_windows.npy", val_windows)
-    np.save("test_windows.npy", test_windows)
+    np.save("processed/train_windows.npy", train_windows)
+    np.save("processed/val_windows.npy", val_windows)
+    np.save("processed/test_windows.npy", test_windows)
 
     train_metadata.to_csv("processed/train_window_metadata.csv", index=False)
     val_metadata.to_csv("processed/val_window_metadata.csv", index=False)
