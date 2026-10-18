@@ -95,9 +95,10 @@ if __name__ == '__main__':
         features.remove("sensor_8")
     train_df, val_df, test_df = scale_df(df, test_df, features)
 
-    train_windows, train_metadata = create_windows(train_df, features, window_size=30)
-    val_windows, val_metadata = create_windows(val_df, features, window_size=30)
-    test_windows, test_metadata = create_windows(test_df, features, window_size=30)
+    window_size = 20
+    train_windows, train_metadata = create_windows(train_df, features, window_size=window_size)
+    val_windows, val_metadata = create_windows(val_df, features, window_size=window_size)
+    test_windows, test_metadata = create_windows(test_df, features, window_size=window_size)
 
     np.save("train_windows.npy", train_windows)
     np.save("val_windows.npy", val_windows)
