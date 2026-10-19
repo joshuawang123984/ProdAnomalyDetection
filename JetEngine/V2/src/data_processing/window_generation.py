@@ -3,45 +3,15 @@ import pandas as pd
 import joblib
 from sklearn.preprocessing import StandardScaler
 
-no_feature_eight = True
+from src.constants import columns, features
 
 def add_column_header(filename: str) -> pd.DataFrame:
-    columns = [
-        "unit_id",
-        "cycle",
-        "setting_1",
-        "setting_2",
-        "setting_3",
-        "sensor_1",
-        "sensor_2",
-        "sensor_3",
-        "sensor_4",
-        "sensor_5",
-        "sensor_6",
-        "sensor_7",
-        "sensor_8",
-        "sensor_9",
-        "sensor_10",
-        "sensor_11",
-        "sensor_12",
-        "sensor_13",
-        "sensor_14",
-        "sensor_15",
-        "sensor_16",
-        "sensor_17",
-        "sensor_18",
-        "sensor_19",
-        "sensor_20",
-        "sensor_21"
-    ]
-
     df = pd.read_csv(
         filename,
         sep=r"\s+",
         header=None,
         names=columns
     )
-
     return df
 
 def create_windows(df: pd.DataFrame, features: list[str], window_size: int = 30) -> tuple[np.ndarray, pd.DataFrame]:
@@ -85,14 +55,12 @@ def scale_df(train_df: pd.DataFrame, test_df: pd.DataFrame, features: list[str])
     return train_split, val_split, test_split
 
 if __name__ == '__main__':
-    df = add_column_header("../CMAPSSDATA/train_FD001.txt")
-    test_df = add_column_header("../CMAPSSDATA/test_FD001.txt")
+    train_dataset = "../CMAPSSDATA/train_FD001.txt"
+    test_dataset = "../CMAPSSDATA/test_FD001.txt"
+    df = add_column_header(train_dataset)
+    test_df = add_column_header(test_dataset)
 
     # assumes train and test have same features
-    features = [col for col in df.columns if col not in ["unit_id", "cycle"]]
-
-    if no_feature_eight:
-        features.remove("sensor_8")
     train_df, val_df, test_df = scale_df(df, test_df, features)
 
     window_size = 25
