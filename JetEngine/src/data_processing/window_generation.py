@@ -55,8 +55,8 @@ def scale_df(train_df: pd.DataFrame, test_df: pd.DataFrame, features: list[str])
     return train_split, val_split, test_split
 
 if __name__ == '__main__':
-    train_dataset = "../CMAPSSDATA/train_FD001.txt"
-    test_dataset = "../CMAPSSDATA/test_FD001.txt"
+    train_dataset = "CMAPSSDATA/train_FD001.txt"
+    test_dataset = "CMAPSSDATA/test_FD001.txt"
     df = add_column_header(train_dataset)
     test_df = add_column_header(test_dataset)
 
