@@ -1,7 +1,7 @@
 import os
 import torch
 import numpy as np
-from lstm import LSTMAutoencoder
+from .models import LSTMAutoencoder
 
 def main():
     test_windows = "processed/test_windows.npy"
