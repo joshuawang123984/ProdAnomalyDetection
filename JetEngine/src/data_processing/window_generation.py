@@ -76,5 +76,3 @@ if __name__ == '__main__':
     train_metadata.to_csv("processed/train_window_metadata.csv", index=False)
     val_metadata.to_csv("processed/val_window_metadata.csv", index=False)
     test_metadata.to_csv("processed/test_window_metadata.csv", index=False)
-
-    # X_test = torch.tensor(np.load(test_windows), dtype=torch.float32)

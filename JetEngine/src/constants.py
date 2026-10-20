@@ -1,3 +1,24 @@
+#
+MODEL_PATH = ""
+SCALER_PATH = ""
+THRESHOLD_PATH = ""
+
+#
+TRAIN_DATASET_PATH = ""
+TEST_DATASET_PATH = ""
+RUL_DATASET_PATH = ""
+
+#
+TRAIN_WINDOW_METADATA_PATH = ""
+VAL_WINDOW_METADATA_PATH = ""
+TEST_WINDOW_METADATA_PATH = ""
+
+#
+TRAIN_WINDOWS_PATH = ""
+VAL_WINDOWS_PATH = ""
+TEST_WINDOWS_PATH = ""
+
+# All columns
 columns = [
     "unit_id",
     "cycle",
@@ -27,6 +48,7 @@ columns = [
     "sensor_21"
 ]
 
+# All fetures
 features = [
     "setting_1",
     "setting_2",

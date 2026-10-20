@@ -104,9 +104,6 @@ def load_model(train_windows: str, val_windows: str, model_path: str, threshold_
 
     return model, threshold, X_train, X_val
 
-def test_model():
-    pass
-
 def main():
     train_windows = "processed/train_windows.npy"
     val_windows = "processed/val_windows.npy"
@@ -118,7 +115,7 @@ def main():
         model, threshold, X_train, X_val = load_model(train_windows, val_windows, model_path, threshold_path)
 
     else:
-        epochs = 1
+        epochs = 50
         model, threshold, X_train, X_val = train_and_save(train_windows, val_windows, model_path, threshold_path, epochs)
 
     model.eval() 
