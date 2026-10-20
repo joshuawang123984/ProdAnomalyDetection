@@ -19,42 +19,6 @@ def group_anomalies(anomaly_indices, max_gap=2):
     groups.append((start, prev))
     return groups
 
-def visualize(errors, threshold, metadata, unit_id):
-    engine = metadata[metadata["unit_id"] == unit_id].copy()
-    engine = engine.sort_values("end_cycle")
-
-    plt.figure(figsize=(14, 5))
-
-    plt.plot(
-        engine["end_cycle"],
-        engine["error"],
-        label="Reconstruction error"
-    )
-
-    plt.axhline(
-        threshold,
-        color="red",
-        linestyle="--",
-        label="Anomaly threshold"
-    )
-
-    anomalies = engine[engine["error"] > threshold]
-
-    plt.scatter(
-        anomalies["end_cycle"],
-        anomalies["error"],
-        color="red",
-        label="Detected anomalies",
-        zorder=3
-    )
-
-    plt.xlabel("Operating cycle")
-    plt.ylabel("Reconstruction error")
-    plt.title(f"LSTM Autoencoder — Engine {unit_id}")
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
-
 def visualize_rul(metadata, unit_id):
     engine = metadata[metadata["unit_id"] == unit_id].sort_values("window_rul")
 
@@ -92,7 +56,7 @@ if __name__ == '__main__':
     metadata["error"] = errors
 
     if test:
-        rul_values = np.loadtxt("../CMAPSSDATA/RUL_FD001.txt")
+        rul_values = np.loadtxt("CMAPSSDATA/RUL_FD001.txt")
         metadata["final_cycle"] = metadata.groupby("unit_id")["end_cycle"].transform("max")
 
         metadata["final_rul"] = metadata["unit_id"].map(lambda uid: rul_values[int(uid) - 1])
@@ -122,6 +86,5 @@ if __name__ == '__main__':
             f"mean={errors_info.mean():.4f}"
         )
 
-    # visualize(errors, threshold, metadata=metadata, unit_id=24)
     for i in range(1, 100):
         visualize_rul(metadata, unit_id=i)

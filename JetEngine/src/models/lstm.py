@@ -104,6 +104,9 @@ def load_model(train_windows: str, val_windows: str, model_path: str, threshold_
 
     return model, threshold, X_train, X_val
 
+def test_model():
+    pass
+
 def main():
     train_windows = "processed/train_windows.npy"
     val_windows = "processed/val_windows.npy"
@@ -115,7 +118,7 @@ def main():
         model, threshold, X_train, X_val = load_model(train_windows, val_windows, model_path, threshold_path)
 
     else:
-        epochs = 50
+        epochs = 1
         model, threshold, X_train, X_val = train_and_save(train_windows, val_windows, model_path, threshold_path, epochs)
 
     model.eval() 
@@ -132,6 +135,16 @@ def main():
 
     np.save("processed/train_errors.npy", train_errors)
     np.save("processed/val_errors.npy", val_errors)
+
+    test_windows = "processed/test_windows.npy"
+    X_test = torch.tensor(np.load(test_windows), dtype=torch.float32)
+
+    model.eval() 
+    with torch.no_grad(): 
+        test_reconstructed = model(X_test) 
+        test_errors = torch.mean((X_test - test_reconstructed) ** 2, dim=(1, 2)).numpy() 
+
+    np.save("processed/test_errors.npy", test_errors)
 
 if __name__ == '__main__':
     main()
