@@ -4,7 +4,7 @@ from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 import os
 
-from src.constants import features
+import src.constants as constants
 
 class LSTMAutoencoder(nn.Module):
     def __init__(self, n_features, hidden_size=64):
@@ -44,7 +44,7 @@ def train_and_save(train_windows: str, val_windows: str, model_path: str, thresh
 
     train_loader = DataLoader(TensorDataset(X_train), batch_size=128, shuffle=True)
 
-    model = LSTMAutoencoder(n_features=len(features), hidden_size=128)
+    model = LSTMAutoencoder(n_features=len(constants.features), hidden_size=128)
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -97,7 +97,7 @@ def load_model(train_windows: str, val_windows: str, model_path: str, threshold_
     X_train = torch.tensor(X_train, dtype=torch.float32)
     X_val = torch.tensor(X_val, dtype=torch.float32)
 
-    model = LSTMAutoencoder(n_features=len(features))
+    model = LSTMAutoencoder(n_features=len(constants.features))
     model.load_state_dict(torch.load(model_path, map_location="cpu"))
 
     threshold = float(np.load(threshold_path))
@@ -105,18 +105,12 @@ def load_model(train_windows: str, val_windows: str, model_path: str, threshold_
     return model, threshold, X_train, X_val
 
 def main():
-    train_windows = "processed/train_windows.npy"
-    val_windows = "processed/val_windows.npy"
-
-    model_path = "processed/lstm_autoencoder.pth"
-    threshold_path = "processed/anomaly_threshold.npy"
-
-    if os.path.exists(model_path) and os.path.exists(threshold_path):
-        model, threshold, X_train, X_val = load_model(train_windows, val_windows, model_path, threshold_path)
+    if os.path.exists(constants.MODEL_PATH) and os.path.exists(constants.THRESHOLD_PATH):
+        model, threshold, X_train, X_val = load_model(constants.TRAIN_WINDOWS_PATH, constants.VAL_WINDOWS_PATH, constants.MODEL_PATH, constants.THRESHOLD_PATH)
 
     else:
         epochs = 50
-        model, threshold, X_train, X_val = train_and_save(train_windows, val_windows, model_path, threshold_path, epochs)
+        model, threshold, X_train, X_val = train_and_save(constants.TRAIN_WINDOWS_PATH, constants.VAL_WINDOWS_PATH, constants.MODEL_PATH, constants.THRESHOLD_PATH, epochs)
 
     model.eval() 
     with torch.no_grad(): 
@@ -125,23 +119,17 @@ def main():
         train_errors = torch.mean((X_train - train_reconstructed) ** 2, dim=(1, 2)).numpy() 
         val_errors = torch.mean( (X_val - val_reconstructed) ** 2, dim=(1, 2)).numpy()
 
-    print("\nThreshold:", threshold)
-    print("Validation windows:", len(val_errors))
-    print("Validation flagged:", np.sum(val_errors > threshold))
-    print("Validation flagged (%):", 100 * np.mean(val_errors > threshold))
+    np.save(constants.TRAIN_ERRORS_PATH, train_errors)
+    np.save(constants.VAL_ERRORS_PATH, val_errors)
 
-    np.save("processed/train_errors.npy", train_errors)
-    np.save("processed/val_errors.npy", val_errors)
-
-    test_windows = "processed/test_windows.npy"
-    X_test = torch.tensor(np.load(test_windows), dtype=torch.float32)
+    X_test = torch.tensor(np.load(constants.TEST_WINDOWS_PATH), dtype=torch.float32)
 
     model.eval() 
     with torch.no_grad(): 
         test_reconstructed = model(X_test) 
         test_errors = torch.mean((X_test - test_reconstructed) ** 2, dim=(1, 2)).numpy() 
 
-    np.save("processed/test_errors.npy", test_errors)
+    np.save(constants.TEST_ERRORS_PATH, test_errors)
 
 if __name__ == '__main__':
     main()
