@@ -1,22 +1,27 @@
-#
-MODEL_PATH = ""
-SCALER_PATH = ""
-THRESHOLD_PATH = ""
+# model load and training details
+MODEL_PATH = "processed/lstm_autoencoder.pth"
+SCALER_PATH = "processed/scaler.joblib"
+THRESHOLD_PATH = "processed/anomaly_threshold.npy"
 
-#
-TRAIN_DATASET_PATH = ""
-TEST_DATASET_PATH = ""
-RUL_DATASET_PATH = ""
+#cmaps datasets
+TRAIN_DATASET_PATH = "CMAPSSDATA/train_FD001.txt"
+TEST_DATASET_PATH = "CMAPSSDATA/test_FD001.txt"
+RUL_DATASET_PATH = "CMAPSSDATA/RUL_FD001.txt"
 
-#
-TRAIN_WINDOW_METADATA_PATH = ""
-VAL_WINDOW_METADATA_PATH = ""
-TEST_WINDOW_METADATA_PATH = ""
+#window generation metadata
+TRAIN_WINDOW_METADATA_PATH = "processed/train_window_metadata.csv"
+VAL_WINDOW_METADATA_PATH = "processed/val_window_metadata.csv"
+TEST_WINDOW_METADATA_PATH = "processed/test_window_metadata.csv"
 
-#
-TRAIN_WINDOWS_PATH = ""
-VAL_WINDOWS_PATH = ""
-TEST_WINDOWS_PATH = ""
+# npy array of windows after generation
+TRAIN_WINDOWS_PATH = "processed/train_windows.npy"
+VAL_WINDOWS_PATH = "processed/val_windows.npy"
+TEST_WINDOWS_PATH = "processed/test_windows.npy"
+
+# model errors 
+TRAIN_ERRORS_PATH = "processed/train_errors.npy"
+VAL_ERRORS_PATH = "processed/val_errors.npy"
+TEST_ERRORS_PATH = "processed/test_errors.npy"
 
 # All columns
 columns = [
