@@ -28,7 +28,7 @@ def visualize_rul(metadata, unit_id):
     plt.plot(engine["window_rul"], engine["error"])
 
     plt.axhline(
-        float(np.load("processed/anomaly_threshold.npy")),
+        float(np.load(constants.THRESHOLD_PATH)),
         color="red",
         linestyle="--",
         label="Anomaly threshold"
@@ -46,39 +46,30 @@ if __name__ == '__main__':
     test = True
 
     if test:
-        errors = np.load("processed/test_errors.npy")
-        metadata = pd.read_csv("processed/test_window_metadata.csv")
+        errors = np.load(constants.TEST_ERRORS_PATH)
+        metadata = pd.read_csv(constants.TEST_WINDOW_METADATA_PATH)
     else:
-        errors = np.load("processed/val_errors.npy")
-        metadata = pd.read_csv("processed/val_window_metadata.csv")
+        errors = np.load(constants.VAL_ERRORS_PATH)
+        metadata = pd.read_csv(constants.VAL_WINDOW_METADATA_PATH)
 
-    threshold = float(np.load("processed/anomaly_threshold.npy"))
+    threshold = float(np.load(constants.THRESHOLD_PATH))
 
     assert len(errors) == len(metadata), "Errors and metadata lengths do not match"
     metadata["error"] = errors
 
     if test:
-        rul_values = np.loadtxt("CMAPSSDATA/RUL_FD001.txt")
+        rul_values = np.loadtxt(constants.RUL_DATASET_PATH)
         metadata["final_cycle"] = metadata.groupby("unit_id")["end_cycle"].transform("max")
-
         metadata["final_rul"] = metadata["unit_id"].map(lambda uid: rul_values[int(uid) - 1])
 
-        metadata["window_rul"] = (
-            metadata["final_rul"]
-            + metadata["final_cycle"]
-            - metadata["end_cycle"]
-        )
+        metadata["window_rul"] = (metadata["final_rul"] + metadata["final_cycle"] - metadata["end_cycle"])
     else:
         # validation engines come from training data, which runs to failure
         metadata["final_cycle"] = metadata.groupby("unit_id")["end_cycle"].transform("max")
         metadata["window_rul"] = metadata["final_cycle"] - metadata["end_cycle"]
 
     anomaly_indices = np.where(errors > threshold)[0]
-
-    print("Threshold:", threshold)
-    print("Total flagged windows:", len(anomaly_indices))
-
-    groups = group_anomalies(anomaly_indices)
+    groups = group_anomalies(anomaly_indices, 5)
 
     for start, end in groups:
         errors_info = errors[start:end + 1]
