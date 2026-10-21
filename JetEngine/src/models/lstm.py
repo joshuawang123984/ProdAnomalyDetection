@@ -34,10 +34,10 @@ class LSTMAutoencoder(nn.Module):
 
         return self.output_layer(decoded)
 
-def train_and_save(train_windows: str, val_windows: str, model_path: str, threshold_path: str, epochs: int) -> tuple[LSTMAutoencoder, float, torch.tensor, torch.tensor]:
+def train_and_save(epochs: int) -> tuple[LSTMAutoencoder, float, torch.tensor, torch.tensor]:
 
-    X_train = np.load(train_windows)
-    X_val = np.load(val_windows)
+    X_train = np.load(constants.TRAIN_WINDOWS_PATH)
+    X_val = np.load(constants.VAL_WINDOWS_PATH)
 
     X_train = torch.tensor(X_train, dtype=torch.float32)
     X_val = torch.tensor(X_val, dtype=torch.float32)
@@ -85,32 +85,32 @@ def train_and_save(train_windows: str, val_windows: str, model_path: str, thresh
     # threshold = train_errors.mean() + 3 * train_errors.std()
     threshold = np.percentile(train_errors, 95)
 
-    torch.save(model.state_dict(), model_path)
-    np.save(threshold_path, np.array(threshold))
+    torch.save(model.state_dict(), constants.MODEL_PATH)
+    np.save(constants.THRESHOLD_PATH, np.array(threshold))
 
     return model, threshold, X_train, X_val
 
-def load_model(train_windows: str, val_windows: str, model_path: str, threshold_path: str) -> tuple[LSTMAutoencoder, float, torch.tensor, torch.tensor]:
-    X_train = np.load(train_windows)
-    X_val = np.load(val_windows)
+def load_model() -> tuple[LSTMAutoencoder, float, torch.tensor, torch.tensor]:
+    X_train = np.load(constants.TRAIN_WINDOWS_PATH)
+    X_val = np.load(constants.VAL_WINDOWS_PATH)
 
     X_train = torch.tensor(X_train, dtype=torch.float32)
     X_val = torch.tensor(X_val, dtype=torch.float32)
 
     model = LSTMAutoencoder(n_features=len(constants.features))
-    model.load_state_dict(torch.load(model_path, map_location="cpu"))
+    model.load_state_dict(torch.load(constants.MODEL_PATH, map_location="cpu"))
 
-    threshold = float(np.load(threshold_path))
+    threshold = float(np.load(constants.THRESHOLD_PATH))
 
     return model, threshold, X_train, X_val
 
 def main():
     if os.path.exists(constants.MODEL_PATH) and os.path.exists(constants.THRESHOLD_PATH):
-        model, threshold, X_train, X_val = load_model(constants.TRAIN_WINDOWS_PATH, constants.VAL_WINDOWS_PATH, constants.MODEL_PATH, constants.THRESHOLD_PATH)
+        model, threshold, X_train, X_val = load_model()
 
     else:
         epochs = 50
-        model, threshold, X_train, X_val = train_and_save(constants.TRAIN_WINDOWS_PATH, constants.VAL_WINDOWS_PATH, constants.MODEL_PATH, constants.THRESHOLD_PATH, epochs)
+        model, threshold, X_train, X_val = train_and_save(epochs)
 
     model.eval() 
     with torch.no_grad(): 

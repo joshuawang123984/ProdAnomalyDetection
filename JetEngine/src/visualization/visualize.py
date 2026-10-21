@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+import src.constants as constants
+
 def group_anomalies(anomaly_indices, max_gap=2):
     if len(anomaly_indices) == 0:
         return []
