@@ -7,7 +7,7 @@ import os
 import src.constants as constants
 
 class LSTMAutoencoder(nn.Module):
-    def __init__(self, n_features, hidden_size=64):
+    def __init__(self, n_features, hidden_size):
         super().__init__()
 
         self.encoder = nn.LSTM(
@@ -44,7 +44,7 @@ def train_and_save(epochs: int) -> tuple[LSTMAutoencoder, float, torch.tensor, t
 
     train_loader = DataLoader(TensorDataset(X_train), batch_size=128, shuffle=True)
 
-    model = LSTMAutoencoder(n_features=len(constants.features), hidden_size=128)
+    model = LSTMAutoencoder(n_features=len(constants.features), hidden_size=constants.HIDDEN_SIZE)
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -97,7 +97,7 @@ def load_model() -> tuple[LSTMAutoencoder, float, torch.tensor, torch.tensor]:
     X_train = torch.tensor(X_train, dtype=torch.float32)
     X_val = torch.tensor(X_val, dtype=torch.float32)
 
-    model = LSTMAutoencoder(n_features=len(constants.features))
+    model = LSTMAutoencoder(n_features=len(constants.features), hidden_size=constants.HIDDEN_SIZE)
     model.load_state_dict(torch.load(constants.MODEL_PATH, map_location="cpu"))
 
     threshold = float(np.load(constants.THRESHOLD_PATH))
@@ -107,6 +107,7 @@ def load_model() -> tuple[LSTMAutoencoder, float, torch.tensor, torch.tensor]:
 def main():
     if os.path.exists(constants.MODEL_PATH) and os.path.exists(constants.THRESHOLD_PATH):
         model, threshold, X_train, X_val = load_model()
+        print("Model Load Test Passed.")
 
     else:
         epochs = 50

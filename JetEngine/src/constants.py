@@ -23,6 +23,8 @@ TRAIN_ERRORS_PATH = "processed/train_errors.npy"
 VAL_ERRORS_PATH = "processed/val_errors.npy"
 TEST_ERRORS_PATH = "processed/test_errors.npy"
 
+HIDDEN_SIZE = 128
+
 # All columns
 columns = [
     "unit_id",
