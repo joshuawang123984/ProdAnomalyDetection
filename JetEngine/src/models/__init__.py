@@ -1,3 +1,3 @@
-from .lstm import LSTMAutoencoder
+from .lstm import LSTMAutoencoder, load_model
 
-__all__ = ["LSTMAutoencoder"]
+__all__ = ["LSTMAutoencoder", "load_model"]
