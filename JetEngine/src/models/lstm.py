@@ -123,14 +123,5 @@ def main():
     np.save(constants.TRAIN_ERRORS_PATH, train_errors)
     np.save(constants.VAL_ERRORS_PATH, val_errors)
 
-    X_test = torch.tensor(np.load(constants.TEST_WINDOWS_PATH), dtype=torch.float32)
-
-    model.eval() 
-    with torch.no_grad(): 
-        test_reconstructed = model(X_test) 
-        test_errors = torch.mean((X_test - test_reconstructed) ** 2, dim=(1, 2)).numpy() 
-
-    np.save(constants.TEST_ERRORS_PATH, test_errors)
-
 if __name__ == '__main__':
     main()

@@ -34,7 +34,7 @@ def create_windows(df: pd.DataFrame, features: list[str], window_size: int = 30)
 
     return np.array(windows), pd.DataFrame(metadata)
 
-def scale_df(train_df: pd.DataFrame, test_df: pd.DataFrame, features: list[str]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def scale_df(train_df: pd.DataFrame, features: list[str]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     unit_ids = train_df["unit_id"].unique()
 
     train_units = unit_ids[:int(0.7 * len(unit_ids))]
@@ -42,34 +42,28 @@ def scale_df(train_df: pd.DataFrame, test_df: pd.DataFrame, features: list[str])
 
     train_split = train_df[train_df["unit_id"].isin(train_units)].copy()
     val_split = train_df[train_df["unit_id"].isin(val_units)].copy()
-    test_split = test_df.copy()
 
     scaler = StandardScaler()
     scaler.fit(train_split[features])
 
     train_split[features] = scaler.transform(train_split[features])
     val_split[features] = scaler.transform(val_split[features])
-    test_split[features] = scaler.transform(test_split[features])
 
     joblib.dump(scaler, constants.SCALER_PATH)
-    return train_split, val_split, test_split
+    return train_split, val_split
 
 if __name__ == '__main__':
     df = add_column_header(constants.TRAIN_DATASET_PATH)
-    test_df = add_column_header(constants.TEST_DATASET_PATH)
 
     # assumes train and test have same features
-    train_df, val_df, test_df = scale_df(df, test_df, constants.features)
+    train_df, val_df = scale_df(df, constants.features)
 
     window_size = constants.WINDOW_SIZE
     train_windows, train_metadata = create_windows(train_df, constants.features, window_size=window_size)
     val_windows, val_metadata = create_windows(val_df, constants.features, window_size=window_size)
-    test_windows, test_metadata = create_windows(test_df, constants.features, window_size=window_size)
 
     np.save(constants.TRAIN_WINDOWS_PATH, train_windows)
     np.save(constants.VAL_WINDOWS_PATH, val_windows)
-    np.save(constants.TEST_WINDOWS_PATH, test_windows)
 
     train_metadata.to_csv(constants.TRAIN_WINDOW_METADATA_PATH, index=False)
     val_metadata.to_csv(constants.VAL_WINDOW_METADATA_PATH, index=False)
-    test_metadata.to_csv(constants.TEST_WINDOW_METADATA_PATH, index=False)

@@ -2,15 +2,34 @@ import numpy as np
 import torch
 import joblib
 import pandas as pd
+import matplotlib.pyplot as plt
 
 import src.constants as constants
 from src.data_processing import add_column_header, create_windows
 from src.models import load_model
-from src.visualization import visualize_rul
+
+def visualize_rul(metadata, unit_id: int, threshold: int) -> None:
+    engine = metadata[metadata["unit_id"] == unit_id].sort_values("window_rul")
+
+    plt.figure(figsize=(14, 5))
+    plt.plot(engine["window_rul"], engine["error"])
+
+    plt.axhline(
+        threshold,
+        color="red",
+        linestyle="--",
+        label="Anomaly threshold"
+    )
+
+    plt.xlabel("Remaining Useful Life (cycles)")
+    plt.ylabel("Reconstruction error")
+    plt.title(f"Reconstruction Error vs RUL — Engine {unit_id}")
+    plt.gca().invert_xaxis()
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
 def main(): 
-    X = np.load(constants.TEST_WINDOWS_PATH)
-
     X = add_column_header(constants.TEST_DATASET_PATH)
     scaler = joblib.load(constants.SCALER_PATH)
     X[constants.features] = scaler.transform(X[constants.features])
