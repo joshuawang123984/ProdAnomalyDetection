@@ -1,3 +1,8 @@
+'''
+NEXT STEP: finish evaluation script. 
+change the constants to the right filename to generate correct windows, then properly visualize in evaluation
+'''
+
 # model load and training details
 MODEL_PATH = "processed/lstm_autoencoder.pth"
 SCALER_PATH = "processed/scaler.joblib"
@@ -82,3 +87,5 @@ features = [
     "sensor_20",
     "sensor_21"
 ]
+
+WINDOW_SIZE = 25
