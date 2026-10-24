@@ -21,14 +21,14 @@ def group_anomalies(anomaly_indices, max_gap=2):
     groups.append((start, prev))
     return groups
 
-def visualize_rul(metadata, unit_id):
+def visualize_rul(metadata, unit_id: int, threshold: int) -> None:
     engine = metadata[metadata["unit_id"] == unit_id].sort_values("window_rul")
 
     plt.figure(figsize=(14, 5))
     plt.plot(engine["window_rul"], engine["error"])
 
     plt.axhline(
-        float(np.load(constants.THRESHOLD_PATH)),
+        threshold,
         color="red",
         linestyle="--",
         label="Anomaly threshold"
@@ -79,5 +79,6 @@ if __name__ == '__main__':
             f"mean={errors_info.mean():.4f}"
         )
 
+    threshold = float(np.load(constants.THRESHOLD_PATH))
     for i in range(1, 100):
-        visualize_rul(metadata, unit_id=i)
+        visualize_rul(metadata, unit_id=i, threshold=threshold)
