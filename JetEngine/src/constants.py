@@ -9,7 +9,8 @@ SCALER_PATH = "processed/scaler.joblib"
 THRESHOLD_PATH = "processed/anomaly_threshold.npy"
 
 #cmaps datasets
-TRAIN_DATASET_PATH = "CMAPSSDATA/train_FD001.txt"
+#TRAIN_DATASET_PATH = "CMAPSSDATA/train_FD001.txt"
+TRAIN_DATASET_PATH = "CMAPSSData/combined_dataset.txt"
 TEST_DATASET_PATH = "CMAPSSDATA/test_FD002.txt"
 RUL_DATASET_PATH = "CMAPSSDATA/RUL_FD002.txt"
 COMBINED_DATASET_PATH = "CMAPSSData/combined_dataset.txt"
