@@ -10,8 +10,9 @@ THRESHOLD_PATH = "processed/anomaly_threshold.npy"
 
 #cmaps datasets
 TRAIN_DATASET_PATH = "CMAPSSDATA/train_FD001.txt"
-TEST_DATASET_PATH = "CMAPSSDATA/test_FD001.txt"
-RUL_DATASET_PATH = "CMAPSSDATA/RUL_FD001.txt"
+TEST_DATASET_PATH = "CMAPSSDATA/test_FD002.txt"
+RUL_DATASET_PATH = "CMAPSSDATA/RUL_FD002.txt"
+COMBINED_DATASET_PATH = "CMAPSSData/combined_dataset.txt"
 
 #window generation metadata
 TRAIN_WINDOW_METADATA_PATH = "processed/train_window_metadata.csv"
