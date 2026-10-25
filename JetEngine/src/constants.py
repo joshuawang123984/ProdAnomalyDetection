@@ -3,6 +3,9 @@ NEXT STEP: finish evaluation script.
 change the constants to the right filename to generate correct windows, then properly visualize in evaluation
 '''
 
+# baseline model load
+BASELINE_PATH = "processed/isolation_forest.joblib"
+
 # model load and training details
 MODEL_PATH = "processed/lstm_autoencoder.pth"
 SCALER_PATH = "processed/scaler.joblib"
