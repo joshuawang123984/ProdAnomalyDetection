@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import joblib
-from sklearn.preprocessing import StandardScaler, RobustScaler
 
 from src.scaler import CondScaler
 import src.constants as constants
@@ -51,17 +50,18 @@ def scale_df(train_df: pd.DataFrame, features: list[str], n_conditions=6) -> tup
     val_split = scaler.transform(val_split)
 
     joblib.dump(scaler, constants.SCALER_PATH)
-    return train_split, val_split
+    return train_split, val_split, scaler
 
 if __name__ == '__main__':
     df = add_column_header(constants.TRAIN_DATASET_PATH)
 
     # assumes train and test have same features
-    train_df, val_df = scale_df(df, constants.features)
+    train_df, val_df, scaler = scale_df(df, constants.features)
+    new_features = scaler.keep
 
     window_size = constants.WINDOW_SIZE
-    train_windows, train_metadata = create_windows(train_df, constants.features, window_size=window_size)
-    val_windows, val_metadata = create_windows(val_df, constants.features, window_size=window_size)
+    train_windows, train_metadata = create_windows(train_df, new_features, window_size=window_size)
+    val_windows, val_metadata = create_windows(val_df, new_features, window_size=window_size)
 
     np.save(constants.TRAIN_WINDOWS_PATH, train_windows)
     np.save(constants.VAL_WINDOWS_PATH, val_windows)
