@@ -35,6 +35,12 @@ TEST_ERRORS_PATH = "processed/test_errors.npy"
 
 HIDDEN_SIZE = 128
 
+operating_settings = [
+    "setting_1",
+    "setting_2",
+    "setting_3",
+]
+
 # All columns
 columns = [
     "unit_id",
@@ -67,9 +73,6 @@ columns = [
 
 # All fetures
 features = [
-    "setting_1",
-    "setting_2",
-    "setting_3",
     "sensor_1",
     "sensor_2",
     "sensor_3",
