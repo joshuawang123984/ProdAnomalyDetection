@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 import joblib
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler
 
+from src.scaler import CondScaler
 import src.constants as constants
 
 def add_column_header(filename: str) -> pd.DataFrame:
@@ -34,7 +35,7 @@ def create_windows(df: pd.DataFrame, features: list[str], window_size: int = 30)
 
     return np.array(windows), pd.DataFrame(metadata)
 
-def scale_df(train_df: pd.DataFrame, features: list[str]) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def scale_df(train_df: pd.DataFrame, features: list[str], n_conditions=6) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     unit_ids = train_df["unit_id"].unique()
 
     train_units = unit_ids[:int(0.7 * len(unit_ids))]
@@ -43,11 +44,11 @@ def scale_df(train_df: pd.DataFrame, features: list[str]) -> tuple[pd.DataFrame,
     train_split = train_df[train_df["unit_id"].isin(train_units)].copy()
     val_split = train_df[train_df["unit_id"].isin(val_units)].copy()
 
-    scaler = StandardScaler()
-    scaler.fit(train_split[features])
+    scaler = CondScaler(features, n_conditions=n_conditions)
+    scaler.fit(train_split)
 
-    train_split[features] = scaler.transform(train_split[features])
-    val_split[features] = scaler.transform(val_split[features])
+    train_split = scaler.transform(train_split)
+    val_split = scaler.transform(val_split)
 
     joblib.dump(scaler, constants.SCALER_PATH)
     return train_split, val_split

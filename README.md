@@ -32,7 +32,19 @@ git clone <repository-url>
 cd JetEngine
 ```
 
-### 3. Generate sliding windows
+### 3. Setup required directories
+
+```bash
+mkdir processed
+```
+
+### 4. Combine datasets
+
+```bash
+python -m src.data_processing.combine_data
+```
+
+### 5. Generate sliding windows
 
 ```bash
 python -m src.data_processing.window_generation
@@ -40,7 +52,7 @@ python -m src.data_processing.window_generation
 
 This preprocesses the dataset, scales the sensor features, and generates sliding windows for training, validation, and testing.
 
-### 4. Train the model
+### 6. Train the model
 
 ```bash
 python -m src.models.lstm
@@ -48,10 +60,10 @@ python -m src.models.lstm
 
 This trains the LSTM autoencoder and saves the trained model and anomaly threshold.
 
-### 5. Visualize anomalies
+### 7. Test results
 
 ```bash
-python -m src.visualization.visualize
+python -m src.evaluation.evaluation
 ```
 
 This visualizes reconstruction errors and detected anomalies across engine cycles.
@@ -67,3 +79,5 @@ Download the dataset and place the required files in the directory expected by t
 ## Notes
 
 The trained model, scaler, and anomaly threshold are saved for reuse during inference, avoiding the need to retrain the model every time.
+
+To predict on new data, update the TEST_DATASET_PATH and RUL_DATASET_PATH to a dataset of your choice. Then run the evaluation script.

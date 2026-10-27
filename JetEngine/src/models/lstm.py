@@ -110,7 +110,7 @@ def main():
         print("Model Load Test Passed.")
 
     else:
-        epochs = 50
+        epochs = 1
         model, threshold, X_train, X_val = train_and_save(epochs)
 
     model.eval() 
