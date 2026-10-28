@@ -11,6 +11,8 @@ class CondScaler:
     def _cond(self, df):
         if self.n == 1:
             return np.zeros(len(df), dtype=int)
+
+        #cmapsdataset is separated into 6 regimes that vary slightly. separate entire dataset into 1 of the 6
         return self.km.predict(df[constants.operating_settings])
 
     def fit(self, df):

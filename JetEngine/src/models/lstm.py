@@ -3,6 +3,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 import os
+import joblib
 
 import src.constants as constants
 
@@ -34,7 +35,7 @@ class LSTMAutoencoder(nn.Module):
 
         return self.output_layer(decoded)
 
-def train_and_save(epochs: int) -> tuple[LSTMAutoencoder, float, torch.tensor, torch.tensor]:
+def train_and_save(epochs: int, features: list[str]) -> tuple[LSTMAutoencoder, torch.tensor, torch.tensor]:
 
     X_train = np.load(constants.TRAIN_WINDOWS_PATH)
     X_val = np.load(constants.VAL_WINDOWS_PATH)
@@ -44,7 +45,7 @@ def train_and_save(epochs: int) -> tuple[LSTMAutoencoder, float, torch.tensor, t
 
     train_loader = DataLoader(TensorDataset(X_train), batch_size=128, shuffle=True)
 
-    model = LSTMAutoencoder(n_features=len(constants.features), hidden_size=constants.HIDDEN_SIZE)
+    model = LSTMAutoencoder(n_features=len(features), hidden_size=constants.HIDDEN_SIZE)
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
@@ -88,30 +89,34 @@ def train_and_save(epochs: int) -> tuple[LSTMAutoencoder, float, torch.tensor, t
     torch.save(model.state_dict(), constants.MODEL_PATH)
     np.save(constants.THRESHOLD_PATH, np.array(threshold))
 
-    return model, threshold, X_train, X_val
+    return model, X_train, X_val
 
-def load_model() -> tuple[LSTMAutoencoder, float, torch.tensor, torch.tensor]:
+def load_model(features: list[str]) -> tuple[LSTMAutoencoder, torch.tensor, torch.tensor]:
     X_train = np.load(constants.TRAIN_WINDOWS_PATH)
     X_val = np.load(constants.VAL_WINDOWS_PATH)
 
     X_train = torch.tensor(X_train, dtype=torch.float32)
     X_val = torch.tensor(X_val, dtype=torch.float32)
 
-    model = LSTMAutoencoder(n_features=len(constants.features), hidden_size=constants.HIDDEN_SIZE)
+    model = LSTMAutoencoder(n_features=len(features), hidden_size=constants.HIDDEN_SIZE)
     model.load_state_dict(torch.load(constants.MODEL_PATH, map_location="cpu"))
 
-    threshold = float(np.load(constants.THRESHOLD_PATH))
-
-    return model, threshold, X_train, X_val
+    return model, X_train, X_val
 
 def main():
+    if os.path.exists(constants.SCALER_PATH):
+        scaler = joblib.load(constants.SCALER_PATH)
+        features = scaler.keep
+    else:
+        raise FileNotFoundError("Scaler File not found.")
+    
     if os.path.exists(constants.MODEL_PATH) and os.path.exists(constants.THRESHOLD_PATH):
-        model, threshold, X_train, X_val = load_model()
+        model, X_train, X_val = load_model(features)
         print("Model Load Test Passed.")
 
     else:
         epochs = 1
-        model, threshold, X_train, X_val = train_and_save(epochs)
+        model, X_train, X_val = train_and_save(epochs, features)
 
     model.eval() 
     with torch.no_grad(): 
