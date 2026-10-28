@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import joblib
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -31,13 +32,18 @@ def visualize_rul(metadata, unit_id: int, threshold: int) -> None:
 
 def main(): 
     X = add_column_header(constants.TEST_DATASET_PATH)
-    scaler = joblib.load(constants.SCALER_PATH)
-    X[constants.features] = scaler.transform(X[constants.features])
+    if os.path.exists(constants.SCALER_PATH):
+        scaler = joblib.load(constants.SCALER_PATH)
+        features = scaler.keep
+    else:
+        raise FileNotFoundError("Scaler File not found.")
+    
+    X = scaler.transform(X)
 
-    windows, metadata = create_windows(X, constants.features, window_size=constants.WINDOW_SIZE)
+    windows, metadata = create_windows(X, features, window_size=constants.WINDOW_SIZE)
     windows = torch.tensor(windows, dtype=torch.float32)
 
-    model, threshold, _, _ = load_model()
+    model, _, _ = load_model(features)
 
     model.eval()
     with torch.no_grad():
