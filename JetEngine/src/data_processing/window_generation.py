@@ -5,13 +5,16 @@ import joblib
 from src.scaler import CondScaler
 import src.constants as constants
 
+'''
+Current issues: training is only for 1 epoch so may result in inccuracies.
+However, check for incorect scaling (or maybe forgetting to scale) as 80 reconstruction error is still far too high
+'''
 def add_column_header(filename: str) -> pd.DataFrame:
-    df = pd.read_csv(
-        filename,
-        sep=r"\s+",
-        header=None,
-        names=constants.columns
+    df = pd.read_csv(filename, sep=r"\s+", header=None)
+    assert df.shape[1] == len(constants.columns), (
+        f"{filename}: {df.shape[1]} fields, expected {len(constants.columns)}"
     )
+    df.columns = constants.columns
     return df
 
 def create_windows(df: pd.DataFrame, features: list[str], window_size: int = 30) -> tuple[np.ndarray, pd.DataFrame]:

@@ -35,10 +35,12 @@ def main():
     if os.path.exists(constants.SCALER_PATH):
         scaler = joblib.load(constants.SCALER_PATH)
         features = scaler.keep
+        print(features, len(features))
     else:
         raise FileNotFoundError("Scaler File not found.")
     
     X = scaler.transform(X)
+    print(len(X.columns))
 
     windows, metadata = create_windows(X, features, window_size=constants.WINDOW_SIZE)
     windows = torch.tensor(windows, dtype=torch.float32)
