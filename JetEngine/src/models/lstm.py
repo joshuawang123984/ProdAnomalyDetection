@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
+import pandas as pd
 import os
 import joblib
 
@@ -78,16 +79,7 @@ def train_and_save(epochs: int, features: list[str]) -> tuple[LSTMAutoencoder, t
                 f"Val loss: {val_loss:.6f}"
             )
         
-    model.eval()
-    with torch.no_grad():
-        train_reconstructed = model(X_train)
-        train_errors = torch.mean((X_train - train_reconstructed) ** 2, dim=(1, 2)).numpy()
-
-    # threshold = train_errors.mean() + 3 * train_errors.std()
-    threshold = np.percentile(train_errors, 95)
-
     torch.save(model.state_dict(), constants.MODEL_PATH)
-    np.save(constants.THRESHOLD_PATH, np.array(threshold))
 
     return model, X_train, X_val
 
@@ -124,6 +116,13 @@ def main():
         val_reconstructed = model(X_val) 
         train_errors = torch.mean((X_train - train_reconstructed) ** 2, dim=(1, 2)).numpy() 
         val_errors = torch.mean( (X_val - val_reconstructed) ** 2, dim=(1, 2)).numpy()
+
+    val_meta = pd.read_csv(constants.VAL_WINDOW_METADATA_PATH)
+    val_rul = (val_meta.groupby("unit_id")["end_cycle"].transform("max") - val_meta["end_cycle"])
+    healthy_errors = val_errors[val_rul > constants.HEALTHY_ENGINE_RUL]
+
+    threshold = np.percentile(healthy_errors, constants.THRESHOLD_PERCENTILE)
+    np.save(constants.THRESHOLD_PATH, np.array(threshold))
 
     np.save(constants.TRAIN_ERRORS_PATH, train_errors)
     np.save(constants.VAL_ERRORS_PATH, val_errors)
