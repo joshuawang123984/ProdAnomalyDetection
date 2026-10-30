@@ -107,7 +107,6 @@ def main():
     if os.path.exists(constants.SCALER_PATH):
         scaler = joblib.load(constants.SCALER_PATH)
         features = scaler.keep
-        print(features, len(features))
     else:
         raise FileNotFoundError("Scaler File not found.")
     
@@ -118,9 +117,6 @@ def main():
     else:
         epochs = 10
         model, X_train, X_val = train_and_save(epochs, features)
-
-    print(X_train.shape[1])
-    print(X_val.shape[1])
 
     model.eval() 
     with torch.no_grad(): 
