@@ -5,15 +5,25 @@ import joblib
 from src.scaler import CondScaler
 import src.constants as constants
 
-'''
-Current issues: training is only for 1 epoch so may result in inccuracies.
-However, check for incorect scaling (or maybe forgetting to scale) as 80 reconstruction error is still far too high
-'''
 def add_column_header(filename: str) -> pd.DataFrame:
     df = pd.read_csv(filename, sep=r"\s+", header=None)
     df.columns = constants.columns
 
     return df
+
+def split_units(train_df: pd.DataFrame, val_frac: float = 0.2, seed: int = 0) -> tuple[np.ndarray, np.ndarray]: 
+    ids = np.sort(train_df["unit_id"].unique())
+    rng = np.random.default_rng(seed)
+
+    train_units, val_units, start = [], [], 0
+    for n in constants.ENGINES_PER_DATASET:
+        block = rng.permutation(ids[start: start + n])
+        k = int(round(val_frac * n))
+        val_units.extend(block[:k])
+        train_units.extend(block[k:])
+        start += n
+
+    return np.array(train_units), np.array(val_units)
 
 def create_windows(df: pd.DataFrame, features: list[str], window_size: int = 30) -> tuple[np.ndarray, pd.DataFrame]:
     windows = []
@@ -35,11 +45,8 @@ def create_windows(df: pd.DataFrame, features: list[str], window_size: int = 30)
 
     return np.array(windows), pd.DataFrame(metadata)
 
-def scale_df(train_df: pd.DataFrame, features: list[str], n_conditions=6) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    unit_ids = train_df["unit_id"].unique()
-
-    train_units = unit_ids[:int(0.7 * len(unit_ids))]
-    val_units = unit_ids[int(0.7 * len(unit_ids)):]
+def scale_df(train_df: pd.DataFrame, features: list[str], n_conditions=6) -> tuple[pd.DataFrame, pd.DataFrame, CondScaler]:
+    train_units, val_units = split_units(train_df)
 
     train_split = train_df[train_df["unit_id"].isin(train_units)].copy()
     val_split = train_df[train_df["unit_id"].isin(val_units)].copy()
