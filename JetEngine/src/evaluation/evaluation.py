@@ -59,6 +59,19 @@ def main():
     metadata["window_rul"] = (metadata["final_rul"] + metadata["final_cycle"] - metadata["end_cycle"])
 
     threshold = float(np.load(constants.THRESHOLD_PATH))
+
+    tr = np.load(constants.TRAIN_ERRORS_PATH)
+    va = np.load(constants.VAL_ERRORS_PATH)
+    print(f"train {tr.mean():.3f} | val {va.mean():.3f} | test {errors.mean():.3f} | "
+        f"test max {errors.max():.3f} | threshold {threshold:.3f}")
+
+    low = metadata["window_rul"] <= 30
+    print("test windows with RUL<=30:", int(low.sum()), "| mean error:", metadata.loc[low, "error"].mean())
+
+    tm = pd.read_csv(constants.TRAIN_WINDOW_METADATA_PATH)
+    vm = pd.read_csv(constants.VAL_WINDOW_METADATA_PATH)
+    print(tm["unit_id"].max(), vm["unit_id"].min())
+    
     for i in range(1, 100):
             visualize_rul(metadata, unit_id=i, threshold=threshold)
 
