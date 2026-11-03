@@ -68,9 +68,17 @@ def main():
     low = metadata["window_rul"] <= 30
     print("test windows with RUL<=30:", int(low.sum()), "| mean error:", metadata.loc[low, "error"].mean())
 
-    tm = pd.read_csv(constants.TRAIN_WINDOW_METADATA_PATH)
     vm = pd.read_csv(constants.VAL_WINDOW_METADATA_PATH)
-    print(tm["unit_id"].max(), vm["unit_id"].min())
+    va = np.load(constants.VAL_ERRORS_PATH)
+
+    edges = np.cumsum(constants.ENGINES_PER_DATASET)      # 100, 360, 460, 709
+    ds = np.searchsorted(edges, vm["unit_id"].to_numpy(), side="left") + 1
+    last = vm.groupby("unit_id")["end_cycle"].transform("max")
+    healthy = ((vm["end_cycle"] / last) < 0.5).to_numpy()
+
+    for d in (1, 2, 3, 4):
+        e = va[(ds == d) & healthy]
+        print(f"FD00{d}: n={len(e)} mean={e.mean():.3f} p99={np.percentile(e, 99):.3f}")
     
     for i in range(1, 100):
             visualize_rul(metadata, unit_id=i, threshold=threshold)
