@@ -4,10 +4,62 @@ import joblib
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.metrics import roc_auc_score
 
 import src.constants as constants
 from src.data_processing import add_column_header, create_windows
 from src.models import load_model
+
+def score_windows(model, scaler, test_path, rul_path):
+    X = scaler.transform(add_column_header(test_path))
+    windows, meta = create_windows(X, scaler.keep, window_size=constants.WINDOW_SIZE)
+    windows = torch.tensor(windows, dtype=torch.float32)
+
+    model.eval()
+    with torch.no_grad():
+        meta["error"] = torch.mean((windows - model(windows)) ** 2, dim=(1, 2)).numpy()
+
+    rul = np.loadtxt(rul_path)                                
+    meta["final_cycle"] = meta.groupby("unit_id")["end_cycle"].transform("max")
+    meta["window_rul"] = rul[meta["unit_id"].to_numpy().astype(int) - 1] + meta["final_cycle"] - meta["end_cycle"]
+    return meta, len(rul)
+
+def sustained_index(flags, k=3):
+    """Index of the window that completes the first run of k consecutive alarms, else None."""
+    run = 0
+    for i, f in enumerate(flags):
+        run = run + 1 if f else 0
+        if run == k:
+            return i
+    return None
+
+def summarize(meta, threshold, k=3, crit_rul=125, near_rul=30):
+    rows = []
+    for _, g in meta.sort_values("end_cycle").groupby("unit_id"):
+        flags = (g["error"] > threshold).to_numpy()
+        rul = g["window_rul"].to_numpy()
+        healthy, crit = rul > crit_rul, rul <= crit_rul
+
+        j = sustained_index(flags[crit], k)
+        rows.append({
+            "final_rul": rul[-1],
+            "last_error": g["error"].iloc[-1],
+            "n_healthy": int(healthy.sum()),
+            "false_alarm": sustained_index(flags[healthy], k) is not None,
+            "lead": rul[crit][j] if j is not None else np.nan,
+        })
+    eng = pd.DataFrame(rows)
+
+    near = eng["final_rul"] <= near_rul
+    scorable = eng[eng["n_healthy"] >= k]
+    return {
+        "engines": len(eng),
+        "near_failure": int(near.sum()),
+        "AUROC": roc_auc_score(near, eng["last_error"]),
+        "detection_rate": eng.loc[near, "lead"].notna().mean(),
+        "median_lead": eng.loc[near, "lead"].median(),
+        "false_alarm_rate": scorable["false_alarm"].mean(),
+    }
 
 def visualize_rul(metadata, unit_id: int, threshold: int) -> None:
     engine = metadata[metadata["unit_id"] == unit_id].sort_values("window_rul")
@@ -31,6 +83,21 @@ def visualize_rul(metadata, unit_id: int, threshold: int) -> None:
     plt.show()
 
 def main(): 
+
+    scaler = joblib.load(constants.SCALER_PATH)
+    model, _, _ = load_model(scaler.keep)
+    threshold = float(np.load(constants.THRESHOLD_PATH))
+
+    results = {}
+    for n in (1, 2, 3, 4):
+        meta, n_total = score_windows(model, scaler,
+                                      f"CMAPSSData/test_FD00{n}.txt",
+                                      f"CMAPSSData/RUL_FD00{n}.txt")
+        res = summarize(meta, threshold)
+        res["dropped (too short)"] = n_total - res["engines"]
+        results[f"FD00{n}"] = res
+    print(pd.DataFrame(results).T.round(3))
+    return
     X = add_column_header(constants.TEST_DATASET_PATH)
     if os.path.exists(constants.SCALER_PATH):
         scaler = joblib.load(constants.SCALER_PATH)

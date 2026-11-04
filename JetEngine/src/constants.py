@@ -1,8 +1,3 @@
-'''
-NEXT STEP: finish evaluation script. 
-change the constants to the right filename to generate correct windows, then properly visualize in evaluation
-'''
-
 # baseline model load
 BASELINE_PATH = "processed/isolation_forest.joblib"
 
@@ -33,7 +28,7 @@ TRAIN_ERRORS_PATH = "processed/train_errors.npy"
 VAL_ERRORS_PATH = "processed/val_errors.npy"
 TEST_ERRORS_PATH = "processed/test_errors.npy"
 
-HIDDEN_SIZE = 128
+HIDDEN_SIZE = 32
 
 operating_settings = [
     "setting_1",
